@@ -69,6 +69,7 @@ void FiniteDifferenceSolver::EvolveE (
     if (m_fdtd_algo == ElectromagneticSolverAlgo::Yee){
         ignore_unused(edge_lengths);
         EvolveECylindrical <CylindricalYeeAlgorithm> ( Efield, Bfield, Jfield, Ffield, lev, dt );
+    }
 #else
     if (m_grid_type == GridType::Collocated) {
 
