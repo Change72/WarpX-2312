@@ -7,88 +7,7 @@
 #include "FiniteDifferenceSolver.H"
 
 #ifndef WARPX_DIM_RZ
-#   include "FieldSolver/FiniteDifferenceSolver/FiniteDifferenceAlgorithms/CartesianYeeAlgorithm.H"
-#   include "FieldSolver/FiniteDifferenceSolver/FiniteDifferenceAlgorithms/CartesianCKCAlgorithm.H"
-#   include "FieldSolver/FiniteDifferenceSolver/FiniteDifferenceAlgorithms/CartesianNodalAlgorithm.H"
-#else
-#   include "FieldSolver/FiniteDifferenceSolver/FiniteDifferenceAlgorithms/CylindricalYeeAlgorithm.H"
-#endif
-#include "Utils/TextMsg.H"
-#include "Utils/WarpXAlgorithmSelection.H"
-#include "Utils/WarpXConst.H"
-#include "WarpX.H"
 
-#include <AMReX.H>
-#include <AMReX_Array4.H>
-#include <AMReX_Config.H>
-#include <AMReX_Extension.H>
-#include <AMReX_GpuAtomic.H>
-#include <AMReX_GpuContainers.H>
-#include <AMReX_GpuControl.H>
-#include <AMReX_GpuDevice.H>
-#include <AMReX_GpuLaunch.H>
-#include <AMReX_GpuQualifiers.H>
-#include <AMReX_IndexType.H>
-#include <AMReX_LayoutData.H>
-#include <AMReX_MFIter.H>
-#include <AMReX_MultiFab.H>
-#include <AMReX_REAL.H>
-#include <AMReX_Utility.H>
-
-#include <AMReX_BaseFwd.H>
-
-#include <array>
-#include <memory>
-
-using namespace amrex;
-
-/**
- * \brief Update the E field, over one timestep
- */
-void FiniteDifferenceSolver::EvolveE (
-    std::array< std::unique_ptr<amrex::MultiFab>, 3 >& Efield,
-    std::array< std::unique_ptr<amrex::MultiFab>, 3 > const& Bfield,
-    std::array< std::unique_ptr<amrex::MultiFab>, 3 > const& Jfield,
-    std::array< std::unique_ptr<amrex::MultiFab>, 3 > const& edge_lengths,
-    std::array< std::unique_ptr<amrex::MultiFab>, 3 > const& face_areas,
-    std::array< std::unique_ptr<amrex::MultiFab>, 3 >& ECTRhofield,
-    std::unique_ptr<amrex::MultiFab> const& Ffield,
-    int lev, amrex::Real const dt ) {
-
-#ifdef AMREX_USE_EB
-    if (m_fdtd_algo != ElectromagneticSolverAlgo::ECT) {
-        amrex::ignore_unused(face_areas, ECTRhofield);
-    }
-#else
-    amrex::ignore_unused(face_areas, ECTRhofield);
-#endif
-
-    // Select algorithm (The choice of algorithm is a runtime option,
-    // but we compile code for each algorithm, using templates)
-#ifdef WARPX_DIM_RZ
-    if (m_fdtd_algo == ElectromagneticSolverAlgo::Yee){
-        ignore_unused(edge_lengths);
-        EvolveECylindrical <CylindricalYeeAlgorithm> ( Efield, Bfield, Jfield, Ffield, lev, dt );
-    }
-#else
-    if (m_grid_type == GridType::Collocated) {
-
-        EvolveECartesian <CartesianNodalAlgorithm> ( Efield, Bfield, Jfield, edge_lengths, Ffield, lev, dt );
-
-    } else if (m_fdtd_algo == ElectromagneticSolverAlgo::Yee || m_fdtd_algo == ElectromagneticSolverAlgo::ECT) {
-
-        EvolveECartesian <CartesianYeeAlgorithm> ( Efield, Bfield, Jfield, edge_lengths, Ffield, lev, dt );
-
-    } else if (m_fdtd_algo == ElectromagneticSolverAlgo::CKC) {
-
-        EvolveECartesian <CartesianCKCAlgorithm> ( Efield, Bfield, Jfield, edge_lengths, Ffield, lev, dt );
-
-#endif
-    } else {
-        WARPX_ABORT_WITH_MESSAGE("EvolveE: Unknown algorithm");
-    }
-
-}
 
 
 #ifndef WARPX_DIM_RZ
@@ -432,3 +351,87 @@ void FiniteDifferenceSolver::EvolveECylindrical (
 }
 
 #endif // corresponds to ifndef WARPX_DIM_RZ
+
+
+#   include "FieldSolver/FiniteDifferenceSolver/FiniteDifferenceAlgorithms/CartesianYeeAlgorithm.H"
+#   include "FieldSolver/FiniteDifferenceSolver/FiniteDifferenceAlgorithms/CartesianCKCAlgorithm.H"
+#   include "FieldSolver/FiniteDifferenceSolver/FiniteDifferenceAlgorithms/CartesianNodalAlgorithm.H"
+#else
+#   include "FieldSolver/FiniteDifferenceSolver/FiniteDifferenceAlgorithms/CylindricalYeeAlgorithm.H"
+#endif
+#include "Utils/TextMsg.H"
+#include "Utils/WarpXAlgorithmSelection.H"
+#include "Utils/WarpXConst.H"
+#include "WarpX.H"
+
+#include <AMReX.H>
+#include <AMReX_Array4.H>
+#include <AMReX_Config.H>
+#include <AMReX_Extension.H>
+#include <AMReX_GpuAtomic.H>
+#include <AMReX_GpuContainers.H>
+#include <AMReX_GpuControl.H>
+#include <AMReX_GpuDevice.H>
+#include <AMReX_GpuLaunch.H>
+#include <AMReX_GpuQualifiers.H>
+#include <AMReX_IndexType.H>
+#include <AMReX_LayoutData.H>
+#include <AMReX_MFIter.H>
+#include <AMReX_MultiFab.H>
+#include <AMReX_REAL.H>
+#include <AMReX_Utility.H>
+
+#include <AMReX_BaseFwd.H>
+
+#include <array>
+#include <memory>
+
+using namespace amrex;
+
+/**
+ * \brief Update the E field, over one timestep
+ */
+void FiniteDifferenceSolver::EvolveE (
+    std::array< std::unique_ptr<amrex::MultiFab>, 3 >& Efield,
+    std::array< std::unique_ptr<amrex::MultiFab>, 3 > const& Bfield,
+    std::array< std::unique_ptr<amrex::MultiFab>, 3 > const& Jfield,
+    std::array< std::unique_ptr<amrex::MultiFab>, 3 > const& edge_lengths,
+    std::array< std::unique_ptr<amrex::MultiFab>, 3 > const& face_areas,
+    std::array< std::unique_ptr<amrex::MultiFab>, 3 >& ECTRhofield,
+    std::unique_ptr<amrex::MultiFab> const& Ffield,
+    int lev, amrex::Real const dt ) {
+
+#ifdef AMREX_USE_EB
+    if (m_fdtd_algo != ElectromagneticSolverAlgo::ECT) {
+        amrex::ignore_unused(face_areas, ECTRhofield);
+    }
+#else
+    amrex::ignore_unused(face_areas, ECTRhofield);
+#endif
+
+    // Select algorithm (The choice of algorithm is a runtime option,
+    // but we compile code for each algorithm, using templates)
+#ifdef WARPX_DIM_RZ
+    if (m_fdtd_algo == ElectromagneticSolverAlgo::Yee){
+        ignore_unused(edge_lengths);
+        EvolveECylindrical <CylindricalYeeAlgorithm> ( Efield, Bfield, Jfield, Ffield, lev, dt );
+#else
+    if (m_grid_type == GridType::Collocated) {
+
+        EvolveECartesian <CartesianNodalAlgorithm> ( Efield, Bfield, Jfield, edge_lengths, Ffield, lev, dt );
+
+    } else if (m_fdtd_algo == ElectromagneticSolverAlgo::Yee || m_fdtd_algo == ElectromagneticSolverAlgo::ECT) {
+
+        EvolveECartesian <CartesianYeeAlgorithm> ( Efield, Bfield, Jfield, edge_lengths, Ffield, lev, dt );
+
+    } else if (m_fdtd_algo == ElectromagneticSolverAlgo::CKC) {
+
+        EvolveECartesian <CartesianCKCAlgorithm> ( Efield, Bfield, Jfield, edge_lengths, Ffield, lev, dt );
+
+#endif
+    } else {
+        WARPX_ABORT_WITH_MESSAGE("EvolveE: Unknown algorithm");
+    }
+
+}
+
