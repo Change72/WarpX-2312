@@ -9,6 +9,7 @@
 #include "EmbeddedBoundary/WarpXFaceInfoBox.H"
 
 
+#ifndef WARPX_DIM_RZ
 #   include "FiniteDifferenceAlgorithms/CartesianYeeAlgorithm.H"
 #   include "FiniteDifferenceAlgorithms/CartesianCKCAlgorithm.H"
 #   include "FiniteDifferenceAlgorithms/CartesianNodalAlgorithm.H"
@@ -45,7 +46,7 @@
 
 using namespace amrex;
 
-#ifndef WARPX_DIM_RZ
+
 
 
 

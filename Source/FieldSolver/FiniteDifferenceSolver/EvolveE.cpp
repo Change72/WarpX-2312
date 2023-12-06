@@ -6,6 +6,7 @@
  */
 #include "FiniteDifferenceSolver.H"
 
+#ifndef WARPX_DIM_RZ
 #   include "FieldSolver/FiniteDifferenceSolver/FiniteDifferenceAlgorithms/CartesianYeeAlgorithm.H"
 #   include "FieldSolver/FiniteDifferenceSolver/FiniteDifferenceAlgorithms/CartesianCKCAlgorithm.H"
 #   include "FieldSolver/FiniteDifferenceSolver/FiniteDifferenceAlgorithms/CartesianNodalAlgorithm.H"
@@ -41,7 +42,7 @@
 
 using namespace amrex;
 
-#ifndef WARPX_DIM_RZ
+
 
 
 
