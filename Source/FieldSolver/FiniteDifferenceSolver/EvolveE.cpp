@@ -45,7 +45,6 @@ using namespace amrex;
 
 
 
-
 #ifndef WARPX_DIM_RZ
 
 template<typename T_Algo>
@@ -389,8 +388,6 @@ void FiniteDifferenceSolver::EvolveECylindrical (
 #endif // corresponds to ifndef WARPX_DIM_RZ
 
 
-
-
 /**
  * \brief Update the E field, over one timestep
  */
@@ -437,4 +434,3 @@ void FiniteDifferenceSolver::EvolveE (
     }
 
 }
-

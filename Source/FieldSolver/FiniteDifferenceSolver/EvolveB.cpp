@@ -7,8 +7,6 @@
 #include "FiniteDifferenceSolver.H"
 
 #include "EmbeddedBoundary/WarpXFaceInfoBox.H"
-
-
 #ifndef WARPX_DIM_RZ
 #   include "FiniteDifferenceAlgorithms/CartesianYeeAlgorithm.H"
 #   include "FiniteDifferenceAlgorithms/CartesianCKCAlgorithm.H"
@@ -45,7 +43,6 @@
 #include <memory>
 
 using namespace amrex;
-
 
 
 
@@ -434,9 +431,6 @@ void FiniteDifferenceSolver::EvolveBCylindrical (
 }
 
 #endif // corresponds to ifndef WARPX_DIM_RZ
-
-
-
 
 /**
  * \brief Update the B field, over one timestep
